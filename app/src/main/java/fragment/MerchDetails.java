@@ -1,0 +1,206 @@
+package fragment;
+
+
+import android.app.Activity;
+import android.app.Fragment;
+import android.content.Context;
+import android.os.Bundle;
+
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import request.JSONRequest;
+import request.LoadJSONTask;
+import request.PostJSONTask;
+import ru.yandex.shatalin.pricemerchapp.R;
+
+
+public class MerchDetails extends Fragment implements LoadJSONTask.Listener, PostJSONTask.Listener {
+
+    public interface onClickOkButton {
+        void clickOkButton();
+    }
+
+    onClickOkButton onClickOkButton;
+
+
+
+    public String URL_ID;
+    public EditText setNameMerch, setPriceMerch, setDescriptionMerch;
+    public CheckBox setEnabledCheckBox, setDeletedCheckBox;
+    public
+    String id;
+    String nameMerch;
+    int priceMerch;
+    boolean enabledMerch;
+    boolean deleteMerch;
+    int countMerch;
+    String merchDescription;
+    public String MODE_STATUS;
+    public String setElementStatus;
+    Bundle bundle;
+    public JSONObject jsonObject;
+    public JSONRequest addDataJsonRequest;
+    Button okButton;
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View v = inflater.inflate(R.layout.fragment_merch_details, null);
+
+        setHasOptionsMenu(true);
+
+        // Получение параметров от активити
+        bundle = getArguments();
+        URL_ID = bundle.getString("URL_ID");
+        MODE_STATUS = bundle.getString("MODE_STATUS");
+        addDataJsonRequest = new JSONRequest();
+        okButton = (Button) v.findViewById(R.id.okButton);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                addParametr();
+                Log.e("Click Ok", "проверяй");
+            }
+        });
+        //инициализация всех элементов интерфейса
+        setNameMerch = (EditText) v.findViewById(R.id.editTextName);
+        setPriceMerch = (EditText) v.findViewById(R.id.editTextSetPrice);
+        setDescriptionMerch = (EditText) v.findViewById(R.id.editTextSetDesription);
+        setEnabledCheckBox = (CheckBox) v.findViewById(R.id.checkBoxEnabled);
+        setDeletedCheckBox = (CheckBox) v.findViewById(R.id.checkBoxDeleted);
+
+        if (MODE_STATUS == "VIEW") {
+            setElementStatus="disable";
+            new LoadJSONTask(this).execute(URL_ID);
+        } else if (MODE_STATUS == "EDIT"){
+            setElementStatus="enable";
+            new LoadJSONTask(this).execute(URL_ID);
+        } else if (MODE_STATUS == "ADD"){
+            setElementStatus="enable";
+            setEditable(setNameMerch, setElementStatus, null);
+            setEditable(setPriceMerch, setElementStatus, null);
+            setEditable(setDescriptionMerch, setElementStatus, null);
+        } else {
+            Log.e("ERROR MODE_STATUS:", MODE_STATUS);
+        }
+        return v;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_item, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
+    public void addParametr(){
+        jsonObject = new JSONObject();
+        try {
+            jsonObject.put("name_merch", setNameMerch.getText());
+            if( setDeletedCheckBox.isChecked()) {
+                jsonObject.put("merch_del", true);
+            } else {
+                jsonObject.put("merch_del", false);
+            }
+            if( setEnabledCheckBox.isChecked()) {
+                jsonObject.put("merch_enabled", true);
+            } else {
+                jsonObject.put("merch_enabled", false);
+            }
+            jsonObject.put("merch_count", "1");
+            jsonObject.put("merch_price", setPriceMerch.getText());
+            jsonObject.put("merch_description", setDescriptionMerch.getText());
+            jsonObject.put("image", "null");
+            addDataJsonRequest.setJson(jsonObject);
+            addDataJsonRequest.setURL_ID(URL_ID);
+            Log.e("URL_ID", URL_ID);
+            new PostJSONTask(this).execute(addDataJsonRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onLoaded(JSONObject response) {
+
+        try {
+            id = response.getString("id");
+            nameMerch = response.getString("name_merch");
+            enabledMerch = response.getBoolean("merch_enabled");
+            deleteMerch = response.getBoolean("merch_del");
+            countMerch = response.getInt("merch_count");
+            priceMerch = response.getInt("merch_price");
+            merchDescription = response.getString("merch_description");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        setEditable(setNameMerch, setElementStatus, nameMerch);
+        setEditable(setPriceMerch, setElementStatus, String.valueOf(priceMerch));
+        setEditable(setDescriptionMerch, setElementStatus, merchDescription);
+        setEnabledCheckBox.setChecked(enabledMerch);
+        setDeletedCheckBox.setChecked(deleteMerch);
+    }
+
+    @Override
+    public void onError() {
+        Toast.makeText(getActivity(), "Error !", Toast.LENGTH_SHORT).show();
+    }
+
+    void setEditable(EditText edit, String status, String name){
+        if( status == "disable"){
+            edit.setText(name);
+            edit.setFocusable(false);
+            edit.setFocusableInTouchMode(false);
+            edit.setClickable(false);
+        } else if(status == "enable"){
+            edit.setText(name);
+            edit.setFocusable(true);
+            edit.setFocusableInTouchMode(true);
+            edit.setClickable(true);
+        } else {
+            edit.setEnabled(false);
+            Log.e("Error EditeText", "Edit status:"+status);
+        }
+    }
+
+    @Override
+    public void onOk(String status) {
+        Toast.makeText(getActivity(), "Товар добавлен! "+status, Toast.LENGTH_SHORT).show();
+        onClickOkButton.clickOkButton();
+    }
+
+    @Override
+    public void onCancel() {
+        Toast.makeText(getActivity(), "Чтото пошло не так!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            onClickOkButton = (onClickOkButton) activity;
+        } catch (ClassCastException e){
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+    }
+
+
+
+}
