@@ -2,20 +2,20 @@ package fragment;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -31,14 +31,13 @@ import ru.yandex.shatalin.pricemerchapp.R;
 
 public class MerchDetails extends Fragment implements LoadJSONTask.Listener, PostJSONTask.Listener {
 
+
+
     public interface onClickOkButton {
         void clickOkButton();
     }
 
     onClickOkButton onClickOkButton;
-
-
-
     public String URL_ID;
     public EditText setNameMerch, setPriceMerch, setDescriptionMerch;
     public CheckBox setEnabledCheckBox, setDeletedCheckBox;
@@ -56,6 +55,10 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
     public JSONObject jsonObject;
     public JSONRequest addDataJsonRequest;
     Button okButton;
+    public String typeRequest;
+    private final String POST = "POST";
+    private final String PUT = "PUT";
+    private final String GET = "GET";
 
 
     @Override
@@ -71,13 +74,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         URL_ID = bundle.getString("URL_ID");
         MODE_STATUS = bundle.getString("MODE_STATUS");
         addDataJsonRequest = new JSONRequest();
-        okButton = (Button) v.findViewById(R.id.okButton);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                addParametr();
-                Log.e("Click Ok", "проверяй");
-            }
-        });
+
         //инициализация всех элементов интерфейса
         setNameMerch = (EditText) v.findViewById(R.id.editTextName);
         setPriceMerch = (EditText) v.findViewById(R.id.editTextSetPrice);
@@ -89,16 +86,23 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
             setElementStatus="disable";
             new LoadJSONTask(this).execute(URL_ID);
         } else if (MODE_STATUS == "EDIT"){
-            setElementStatus="enable";
-            new LoadJSONTask(this).execute(URL_ID);
+            enableEdit();
         } else if (MODE_STATUS == "ADD"){
             setElementStatus="enable";
+            typeRequest = POST;
             setEditable(setNameMerch, setElementStatus, null);
             setEditable(setPriceMerch, setElementStatus, null);
             setEditable(setDescriptionMerch, setElementStatus, null);
         } else {
             Log.e("ERROR MODE_STATUS:", MODE_STATUS);
         }
+        okButton = (Button) v.findViewById(R.id.okButton);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                addParametr(typeRequest);
+                Log.e("Click Ok", "проверяй");
+            }
+        });
         return v;
     }
 
@@ -108,8 +112,23 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-    public void addParametr(){
+
+        int id = item.getItemId();
+
+        // Операции для выбранного пункта меню
+        switch (id) {
+            case R.id.action_edit:
+                enableEdit();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void addParametr(String typeRequest){
         jsonObject = new JSONObject();
         try {
             jsonObject.put("name_merch", setNameMerch.getText());
@@ -129,6 +148,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
             jsonObject.put("image", "null");
             addDataJsonRequest.setJson(jsonObject);
             addDataJsonRequest.setURL_ID(URL_ID);
+            addDataJsonRequest.setTypeRequest(typeRequest);
             Log.e("URL_ID", URL_ID);
             new PostJSONTask(this).execute(addDataJsonRequest);
         } catch (JSONException e) {
@@ -200,6 +220,16 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
                     + " must implement OnHeadlineSelectedListener");
         }
     }
+
+    private void enableEdit(){
+        setElementStatus="enable";
+        typeRequest = PUT;
+        setEditable(setNameMerch, setElementStatus, setNameMerch.getText().toString());
+        setEditable(setPriceMerch, setElementStatus, setPriceMerch.getText().toString());
+        setEditable(setDescriptionMerch, setElementStatus, setDescriptionMerch.getText().toString());
+    }
+
+
 
 
 

@@ -3,6 +3,11 @@ package request;
 import org.json.JSONObject;
 
 public class JSONRequest {
+
+    JSONObject json;
+    String URL_ID;
+    String typeRequest;
+
     public JSONObject getJson() {
         return json;
     }
@@ -19,6 +24,12 @@ public class JSONRequest {
         this.URL_ID = URL_ID;
     }
 
-    JSONObject json;
-    String URL_ID;
+
+    public String getTypeRequest() {
+        return typeRequest;
+    }
+
+    public void setTypeRequest(String typeRequest) {
+        this.typeRequest = typeRequest;
+    }
 }

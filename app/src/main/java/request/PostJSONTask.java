@@ -33,13 +33,14 @@ public class PostJSONTask extends AsyncTask<JSONRequest, Void, String> {
 
     private void JSONPost(JSONRequest json){
         String urlResponse = json.getURL_ID();
+        String typeRequest = json.typeRequest;
         JSONObject jsonObject = json.getJson();
         try {
             URL url = new URL(urlResponse);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(15000 /* milliseconds */);
             conn.setConnectTimeout(15000 /* milliseconds */);
-            conn.setRequestMethod("POST");
+            conn.setRequestMethod(typeRequest);
             conn.setDoInput (true);
             conn.setDoOutput (true);
 
