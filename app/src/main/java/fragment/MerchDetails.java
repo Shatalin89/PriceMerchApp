@@ -48,9 +48,15 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
 
     public interface onClickOkButton {
         void clickOkButton();
+
+    }
+    public interface onClickImageView {
+        void clickImageView();
+
     }
 
     onClickOkButton onClickOkButton;
+    onClickImageView onClickImageView;
     public String URL_ID;
     public EditText setNameMerch, setPriceMerch, setDescriptionMerch;
     public CheckBox setEnabledCheckBox, setDeletedCheckBox;

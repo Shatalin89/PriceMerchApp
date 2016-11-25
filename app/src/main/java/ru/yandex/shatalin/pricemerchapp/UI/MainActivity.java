@@ -23,7 +23,7 @@ import fragment.MerchView;
 import ru.yandex.shatalin.pricemerchapp.R;
 
 
-public class MainActivity extends Activity implements MerchView.onClickListView, MerchDetails.onClickOkButton {
+public class MainActivity extends Activity implements MerchView.onClickListView, MerchDetails.onClickOkButton, MerchDetails.onClickImageView {
 
     public static final String URL = "http://192.168.1.10:8008";
     private static final String URL_MERCH = "/api/v1/merch/";
@@ -93,6 +93,8 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         startFragement();
     }
 
+
+
     public void onClickImageLoad(View view) {
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
@@ -103,5 +105,10 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         } catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void clickImageView() {
+
     }
 }
