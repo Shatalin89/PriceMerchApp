@@ -4,8 +4,15 @@ package fragment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 
+import android.provider.MediaStore;
+import android.text.style.IconMarginSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 
@@ -23,13 +31,18 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 import request.JSONRequest;
 import request.LoadJSONTask;
 import request.PostJSONTask;
 import ru.yandex.shatalin.pricemerchapp.R;
 
+import static android.app.Activity.RESULT_OK;
+
 
 public class MerchDetails extends Fragment implements LoadJSONTask.Listener, PostJSONTask.Listener {
+
 
 
 
@@ -59,7 +72,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
     private final String POST = "POST";
     private final String PUT = "PUT";
     private final String GET = "GET";
-
+    public ImageView imageView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -74,7 +87,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         URL_ID = bundle.getString("URL_ID");
         MODE_STATUS = bundle.getString("MODE_STATUS");
         addDataJsonRequest = new JSONRequest();
-
+        imageView = (ImageView)v.findViewById(R.id.ViewMerchImage);
         //инициализация всех элементов интерфейса
         setNameMerch = (EditText) v.findViewById(R.id.editTextName);
         setPriceMerch = (EditText) v.findViewById(R.id.editTextSetPrice);
@@ -228,7 +241,6 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         setEditable(setPriceMerch, setElementStatus, setPriceMerch.getText().toString());
         setEditable(setDescriptionMerch, setElementStatus, setDescriptionMerch.getText().toString());
     }
-
 
 
 

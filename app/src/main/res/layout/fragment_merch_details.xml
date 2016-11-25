@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -93,13 +94,14 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="3.95"
-            android:weightSum="3">
+            android:layout_weight="4"
+            android:weightSum="7">
 
             <TextView
                 android:text="Стоимость товара"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="0.2"
                 android:id="@+id/textViewForPriceDescription" />
 
             <EditText
@@ -107,6 +109,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:ems="10"
+                android:layout_weight="0.4"
                 android:id="@+id/editTextSetPrice" />
 
             <TextView
@@ -118,10 +121,18 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
-                android:ems="10"
+
                 android:id="@+id/editTextSetDesription"
-                android:layout_weight="1.64" />
+                android:layout_weight="0.18" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:srcCompat="@android:color/darker_gray"
+                android:layout_weight="6"
+                android:id="@+id/ViewMerchImage"
+                android:onClick="onClickImageLoad"/>
+
 
         </LinearLayout>
 
