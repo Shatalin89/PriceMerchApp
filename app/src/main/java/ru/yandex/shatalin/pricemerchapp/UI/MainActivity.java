@@ -96,28 +96,12 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
     public void onClickImageLoad(View view) {
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
-        startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-
-        super.onActivityResult(requestCode, resultCode, data);
-
         Bitmap bitmap = null;
-        switch (requestCode){
-            case GALLERY_REQUEST:
-                if (requestCode == RESULT_OK){
-                    Uri selectedImage = data.getData();
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-                    } catch (IOException e){
-                        e.printStackTrace();
-                    }
-
-                }
+        Uri selectedImage = photoPickerIntent.getData();
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+        } catch (IOException e){
+            e.printStackTrace();
         }
-
     }
 }
