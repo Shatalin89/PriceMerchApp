@@ -2,6 +2,7 @@ package ru.yandex.shatalin.pricemerchapp.UI;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.provider.MediaStore;
@@ -13,10 +14,13 @@ import android.app.FragmentTransaction;
 import android.os.StrictMode;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import fragment.MerchDetails;
 import fragment.MerchView;
@@ -25,7 +29,7 @@ import ru.yandex.shatalin.pricemerchapp.R;
 
 public class MainActivity extends Activity implements MerchView.onClickListView, MerchDetails.onClickOkButton, MerchDetails.onClickImageView {
 
-    public static final String URL = "http://192.168.1.10:8008";
+    public static final String URL = "http://192.168.1.140:8008";
     private static final String URL_MERCH = "/api/v1/merch/";
     static final int GALLERY_REQUEST = 1;
 
@@ -93,22 +97,22 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         startFragement();
     }
 
-
-
-    public void onClickImageLoad(View view) {
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image/*");
-        Bitmap bitmap = null;
-        Uri selectedImage = photoPickerIntent.getData();
-        try {
-            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-    }
-
     @Override
-    public void clickImageView() {
+    public Bitmap clickImageView(Intent imageReturnedIntent){
+
+        try {
+            final Uri imageUri = imageReturnedIntent.getData();
+            final InputStream imageStream;
+            imageStream = getContentResolver().openInputStream(imageUri);
+            final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+            return selectedImage;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+
 
     }
+
+
 }

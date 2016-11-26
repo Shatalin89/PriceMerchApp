@@ -131,7 +131,8 @@
                 app:srcCompat="@android:color/darker_gray"
                 android:layout_weight="6"
                 android:id="@+id/ViewMerchImage"
-                android:onClick="onClickImageLoad"/>
+                android:onClick="onClickImageMerch"
+                android:clickable="true" />
 
 
         </LinearLayout>

@@ -7,6 +7,7 @@ import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,12 +32,15 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import request.JSONRequest;
 import request.LoadJSONTask;
 import request.PostJSONTask;
 import ru.yandex.shatalin.pricemerchapp.R;
+import ru.yandex.shatalin.pricemerchapp.UI.MainActivity;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -44,15 +48,12 @@ import static android.app.Activity.RESULT_OK;
 public class MerchDetails extends Fragment implements LoadJSONTask.Listener, PostJSONTask.Listener {
 
 
-
-
     public interface onClickOkButton {
         void clickOkButton();
-
     }
-    public interface onClickImageView {
-        void clickImageView();
 
+    public interface onClickImageView {
+        Bitmap clickImageView(Intent intent);
     }
 
     onClickOkButton onClickOkButton;
@@ -79,6 +80,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
     private final String PUT = "PUT";
     private final String GET = "GET";
     public ImageView imageView;
+    private final int Pick_image = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -93,7 +95,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         URL_ID = bundle.getString("URL_ID");
         MODE_STATUS = bundle.getString("MODE_STATUS");
         addDataJsonRequest = new JSONRequest();
-        imageView = (ImageView)v.findViewById(R.id.ViewMerchImage);
+        imageView = (ImageView) v.findViewById(R.id.ViewMerchImage);
         //инициализация всех элементов интерфейса
         setNameMerch = (EditText) v.findViewById(R.id.editTextName);
         setPriceMerch = (EditText) v.findViewById(R.id.editTextSetPrice);
@@ -102,12 +104,12 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         setDeletedCheckBox = (CheckBox) v.findViewById(R.id.checkBoxDeleted);
 
         if (MODE_STATUS == "VIEW") {
-            setElementStatus="disable";
+            setElementStatus = "disable";
             new LoadJSONTask(this).execute(URL_ID);
-        } else if (MODE_STATUS == "EDIT"){
+        } else if (MODE_STATUS == "EDIT") {
             enableEdit();
-        } else if (MODE_STATUS == "ADD"){
-            setElementStatus="enable";
+        } else if (MODE_STATUS == "ADD") {
+            setElementStatus = "enable";
             typeRequest = POST;
             setEditable(setNameMerch, setElementStatus, null);
             setEditable(setPriceMerch, setElementStatus, null);
@@ -122,6 +124,20 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
                 Log.e("Click Ok", "проверяй");
             }
         });
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+                                         public void onClick(View v) {
+                                             // onClickImageLoad();
+                                             //Вызываем стандартную галерею для выбора изображения с помощью Intent.ACTION_PICK:
+                                             Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                                             //Тип получаемых объектов - image:
+                                             photoPickerIntent.setType("image/*");
+                                             //Запускаем переход с ожиданием обратного результата в виде информации об изображении:
+                                             startActivityForResult(photoPickerIntent, Pick_image);
+                                             Log.e("Click IMAGE", "проверяй");
+                                         }
+                                     }
+        );
         return v;
     }
 
@@ -147,16 +163,16 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         }
     }
 
-    public void addParametr(String typeRequest){
+    public void addParametr(String typeRequest) {
         jsonObject = new JSONObject();
         try {
             jsonObject.put("name_merch", setNameMerch.getText());
-            if( setDeletedCheckBox.isChecked()) {
+            if (setDeletedCheckBox.isChecked()) {
                 jsonObject.put("merch_del", true);
             } else {
                 jsonObject.put("merch_del", false);
             }
-            if( setEnabledCheckBox.isChecked()) {
+            if (setEnabledCheckBox.isChecked()) {
                 jsonObject.put("merch_enabled", true);
             } else {
                 jsonObject.put("merch_enabled", false);
@@ -201,26 +217,26 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         Toast.makeText(getActivity(), "Error !", Toast.LENGTH_SHORT).show();
     }
 
-    void setEditable(EditText edit, String status, String name){
-        if( status == "disable"){
+    void setEditable(EditText edit, String status, String name) {
+        if (status == "disable") {
             edit.setText(name);
             edit.setFocusable(false);
             edit.setFocusableInTouchMode(false);
             edit.setClickable(false);
-        } else if(status == "enable"){
+        } else if (status == "enable") {
             edit.setText(name);
             edit.setFocusable(true);
             edit.setFocusableInTouchMode(true);
             edit.setClickable(true);
         } else {
             edit.setEnabled(false);
-            Log.e("Error EditeText", "Edit status:"+status);
+            Log.e("Error EditeText", "Edit status:" + status);
         }
     }
 
     @Override
     public void onOk(String status) {
-        Toast.makeText(getActivity(), "Товар добавлен! "+status, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "Товар добавлен! " + status, Toast.LENGTH_SHORT).show();
         onClickOkButton.clickOkButton();
     }
 
@@ -234,21 +250,31 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         super.onAttach(activity);
         try {
             onClickOkButton = (onClickOkButton) activity;
-        } catch (ClassCastException e){
+            onClickImageView = (onClickImageView) activity;
+        } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnHeadlineSelectedListener");
         }
     }
 
-    private void enableEdit(){
-        setElementStatus="enable";
+    private void enableEdit() {
+        setElementStatus = "enable";
         typeRequest = PUT;
         setEditable(setNameMerch, setElementStatus, setNameMerch.getText().toString());
         setEditable(setPriceMerch, setElementStatus, setPriceMerch.getText().toString());
         setEditable(setDescriptionMerch, setElementStatus, setDescriptionMerch.getText().toString());
     }
 
-
-
-
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+        switch (requestCode) {
+            case Pick_image:
+                if (resultCode == RESULT_OK) {
+                    //Получаем URI изображения, преобразуем его в Bitmap
+                    //объект и отображаем в элементе ImageView нашего интерфейса:
+                    imageView.setImageBitmap(onClickImageView.clickImageView((imageReturnedIntent)));
+                }
+        }
+    }
 }
