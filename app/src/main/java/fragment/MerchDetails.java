@@ -54,7 +54,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
 
     public interface onClickImageView {
         Bitmap clickImageView(Intent intent);
-        void doFileUpload();
+      //  void doFileUpload();
     }
 
     onClickOkButton onClickOkButton;
@@ -151,7 +151,6 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
 
         int id = item.getItemId();
 
