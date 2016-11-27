@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -99,7 +100,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
 
     @Override
     public Bitmap clickImageView(Intent imageReturnedIntent){
-
         try {
             final Uri imageUri = imageReturnedIntent.getData();
             final InputStream imageStream;
@@ -110,7 +110,10 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
             e.printStackTrace();
             return null;
         }
+    }
 
+    @Override
+    public void doFileUpload(){
 
     }
 

@@ -54,6 +54,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
 
     public interface onClickImageView {
         Bitmap clickImageView(Intent intent);
+        void doFileUpload();
     }
 
     onClickOkButton onClickOkButton;
@@ -81,6 +82,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
     private final String GET = "GET";
     public ImageView imageView;
     private final int Pick_image = 1;
+    public Bitmap bitmapimg;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -180,7 +182,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
             jsonObject.put("merch_count", "1");
             jsonObject.put("merch_price", setPriceMerch.getText());
             jsonObject.put("merch_description", setDescriptionMerch.getText());
-            jsonObject.put("image", "null");
+            //jsonObject.put("image", bitmapimg);
             addDataJsonRequest.setJson(jsonObject);
             addDataJsonRequest.setURL_ID(URL_ID);
             addDataJsonRequest.setTypeRequest(typeRequest);
@@ -273,8 +275,11 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
                 if (resultCode == RESULT_OK) {
                     //Получаем URI изображения, преобразуем его в Bitmap
                     //объект и отображаем в элементе ImageView нашего интерфейса:
-                    imageView.setImageBitmap(onClickImageView.clickImageView((imageReturnedIntent)));
+                    bitmapimg = onClickImageView.clickImageView((imageReturnedIntent));
+                    imageView.setImageBitmap(bitmapimg);
                 }
         }
     }
+
+
 }
