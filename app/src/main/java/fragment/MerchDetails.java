@@ -134,6 +134,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
                                              Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                                              //Тип получаемых объектов - image:
                                              photoPickerIntent.setType("image/*");
+
                                              //Запускаем переход с ожиданием обратного результата в виде информации об изображении:
                                              startActivityForResult(photoPickerIntent, Pick_image);
                                              Log.e("Click IMAGE", "проверяй");

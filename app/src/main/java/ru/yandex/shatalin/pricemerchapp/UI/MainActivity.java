@@ -1,11 +1,16 @@
 package ru.yandex.shatalin.pricemerchapp.UI;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -36,7 +41,7 @@ import ru.yandex.shatalin.pricemerchapp.R;
 
 public class MainActivity extends Activity implements MerchView.onClickListView, MerchDetails.onClickOkButton, MerchDetails.onClickImageView {
 
-    public static final String URLM = "http://192.168.1.140:8008";
+    public static final String URLM = "http://192.168.1.10:8008";
     private static final String URL_MERCH = "/api/v1/merch/";
     static final int GALLERY_REQUEST = 1;
 
@@ -51,6 +56,8 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(ClassLoader.getSystemResourceAsStream());
+
+
         setContentView(R.layout.activity_main);
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -107,11 +114,27 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
     @Override
     public Bitmap clickImageView(Intent imageReturnedIntent){
         try {
-            final Uri imageUri = imageReturnedIntent.getData();
+            Uri imageUri = imageReturnedIntent.getData();
+
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+            Log.i("filePathColumn: ", filePathColumn[0]);
+            Cursor cursor  = getContentResolver().query(imageUri, filePathColumn, null, null, null);
+            Log.i("cursor: ", cursor.toString());
+            cursor.moveToFirst();
+            Log.i("cursor: ", cursor.toString());
+            int culumnindex = cursor.getColumnIndex(filePathColumn[0]);
+            Log.i("culumnindex: ", String.valueOf(culumnindex));
+            String filePath = cursor.getString(culumnindex);
+            Log.i("filePath: ", filePath);
+            cursor.close();
+
             Log.i("clickImageView: ", imageUri.getPath());
-            doFileUpload(imageUri.getPath());
+
+         //  doFileUpload(filePath);
             final InputStream imageStream;
             imageStream = getContentResolver().openInputStream(imageUri);
+
+
             final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
             return selectedImage;
         } catch (FileNotFoundException e) {
@@ -129,7 +152,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         int bytesRead, bytesAvailable, bufferSize;
         byte[] buffer;
         int maxBufferSize = 1*1024*1024;
-        String urlString = "http://192.168.1.140:8008/photos/upload/";   // server ip
+        String urlString = "http://192.168.1.10:8008/photos/upload/";   // server ip
         try
         {
             //------------------ CLIENT REQUEST
