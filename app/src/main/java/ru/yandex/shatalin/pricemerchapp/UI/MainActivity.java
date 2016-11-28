@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.annotation.CheckResult;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +22,9 @@ import android.os.StrictMode;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -41,23 +44,22 @@ import ru.yandex.shatalin.pricemerchapp.R;
 
 public class MainActivity extends Activity implements MerchView.onClickListView, MerchDetails.onClickOkButton, MerchDetails.onClickImageView {
 
-    public static final String URLM = "http://192.168.1.10:8008";
+    public String URLM;
     private static final String URL_MERCH = "/api/v1/merch/";
-    static final int GALLERY_REQUEST = 1;
+
 
     public MerchView FragMerchView;
     public MerchDetails FragMerchDetails;
 
     public FragmentTransaction transaction;
     private Bundle bundle;
-    int MENU_ID=1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(ClassLoader.getSystemResourceAsStream());
-
-
+        URLM = "http://192.168.1.140:8008";
         setContentView(R.layout.activity_main);
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -71,16 +73,13 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         startFragement();
     }
 
-
     void startFragement(){
-
         FragMerchView = new MerchView();
         bundle.putString("URL", URLM);
         FragMerchView.setArguments(bundle);
         transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.frgmCont, FragMerchView);
         transaction.commit();
-
     }
 
     @Override
@@ -92,7 +91,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.frgmCont, FragMerchDetails);
         transaction.commit();
-
     }
 
     public void addClickMerchView(View view) {
@@ -103,7 +101,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.frgmCont, FragMerchDetails);
         transaction.commit();
-
     }
 
     @Override
@@ -115,7 +112,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
     public Bitmap clickImageView(Intent imageReturnedIntent){
         try {
             Uri imageUri = imageReturnedIntent.getData();
-
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
             Log.i("filePathColumn: ", filePathColumn[0]);
             Cursor cursor  = getContentResolver().query(imageUri, filePathColumn, null, null, null);
@@ -127,14 +123,10 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
             String filePath = cursor.getString(culumnindex);
             Log.i("filePath: ", filePath);
             cursor.close();
-
             Log.i("clickImageView: ", imageUri.getPath());
-
-         //  doFileUpload(filePath);
+            doFileUpload(filePath);
             final InputStream imageStream;
             imageStream = getContentResolver().openInputStream(imageUri);
-
-
             final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
             return selectedImage;
         } catch (FileNotFoundException e) {
@@ -142,7 +134,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
             return null;
         }
     }
-
 
     public void doFileUpload(String path){
         HttpURLConnection conn = null;
@@ -152,7 +143,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         int bytesRead, bytesAvailable, bufferSize;
         byte[] buffer;
         int maxBufferSize = 1*1024*1024;
-        String urlString = "http://192.168.1.10:8008/photos/upload/";   // server ip
+        String urlString = URLM+"/photos/upload/";   // server ip
         try
         {
             //------------------ CLIENT REQUEST
@@ -223,6 +214,35 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         catch (IOException ioex){
             Log.e("Debug", "error: " + ioex.getMessage(), ioex);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.server1:
+                URLM = "http://192.168.1.140:8008";
+                return true;
+            case R.id.server2:
+                URLM = "http://192.168.1.10:8008";
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.server1).setCheckable(true);
+        Log.i("URLM start:", URLM);
+        return true;
     }
 }
 
