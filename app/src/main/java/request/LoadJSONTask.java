@@ -2,7 +2,9 @@ package request;
 
 
 import android.os.AsyncTask;
+import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,27 +15,27 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
-public class LoadJSONTask extends AsyncTask<String, Void, JSONObject> {
+public class LoadJSONTask extends AsyncTask<String, Void, JSONArray> {
 
     public LoadJSONTask(Listener listener) {
         mListener = listener;
     }
 
     public interface Listener {
-        void onLoaded(JSONObject response);
+        void onLoaded(JSONArray response);
         void onError();
     }
 
     private Listener mListener;
 
     @Override
-    protected JSONObject doInBackground(String... strings) {
+    protected JSONArray doInBackground(String... strings) {
 
         String stringResponse = null;
         try {
             stringResponse = loadJSON(strings[0]);
 
-            JSONObject response =  new JSONObject(stringResponse);
+            JSONArray response =  new JSONArray(stringResponse);
             return response;
         } catch (IOException e) {
             e.printStackTrace();
@@ -45,8 +47,8 @@ public class LoadJSONTask extends AsyncTask<String, Void, JSONObject> {
     }
 
     @Override
-    protected void onPostExecute(JSONObject response) {
-
+    protected void onPostExecute(JSONArray response) {
+        Log.i("response: ", response.toString());
         if (response != null) {
             mListener.onLoaded(response);
         } else {
@@ -55,7 +57,7 @@ public class LoadJSONTask extends AsyncTask<String, Void, JSONObject> {
     }
 
     private String loadJSON(String jsonURL) throws IOException {
-
+        Log.i("loadJSON: ", jsonURL);
         URL url = new URL(jsonURL);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setReadTimeout(10000);

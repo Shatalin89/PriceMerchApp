@@ -2,18 +2,11 @@ package fragment;
 
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
-import android.net.Uri;
 import android.os.Bundle;
 
-import android.provider.MediaStore;
-import android.text.style.IconMarginSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,19 +21,14 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 
-
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 
 import request.JSONRequest;
 import request.LoadJSONTask;
 import request.PostJSONTask;
 import ru.yandex.shatalin.pricemerchapp.R;
-import ru.yandex.shatalin.pricemerchapp.UI.MainActivity;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -194,9 +182,10 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
     }
 
     @Override
-    public void onLoaded(JSONObject response) {
+    public void onLoaded(JSONArray response) {
 
-        try {
+        Log.i("LENGHT onLoaded: ", String.valueOf(response.length()));
+     /*   try {
             id = response.getString("id");
             nameMerch = response.getString("name_merch");
             enabledMerch = response.getBoolean("merch_enabled");
@@ -211,7 +200,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         setEditable(setPriceMerch, setElementStatus, String.valueOf(priceMerch));
         setEditable(setDescriptionMerch, setElementStatus, merchDescription);
         setEnabledCheckBox.setChecked(enabledMerch);
-        setDeletedCheckBox.setChecked(deleteMerch);
+        setDeletedCheckBox.setChecked(deleteMerch);*/
     }
 
     @Override

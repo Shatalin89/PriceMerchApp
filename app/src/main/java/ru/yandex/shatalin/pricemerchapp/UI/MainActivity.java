@@ -45,7 +45,7 @@ import ru.yandex.shatalin.pricemerchapp.R;
 public class MainActivity extends Activity implements MerchView.onClickListView, MerchDetails.onClickOkButton, MerchDetails.onClickImageView {
 
     public String URLM;
-    private static final String URL_MERCH = "/api/v1/merch/";
+    private static final String URL_MERCH = "/merch/";
 
 
     public MerchView FragMerchView;
@@ -59,7 +59,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(ClassLoader.getSystemResourceAsStream());
-        URLM = "http://192.168.1.140:8008";
+        URLM = "http://192.168.1.10:8008";
         setContentView(R.layout.activity_main);
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -143,7 +143,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         int bytesRead, bytesAvailable, bufferSize;
         byte[] buffer;
         int maxBufferSize = 1*1024*1024;
-        String urlString = URLM+"/photos/upload/";   // server ip
+        String urlString = URLM+"/merch/photo/";   // server ip
         try
         {
             //------------------ CLIENT REQUEST
@@ -222,9 +222,11 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         switch (id) {
             case R.id.server1:
                 URLM = "http://192.168.1.140:8008";
+                startFragement();
                 return true;
             case R.id.server2:
                 URLM = "http://192.168.1.10:8008";
+                startFragement();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,14 +34,14 @@ import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 public class MerchView extends Fragment implements  AdapterView.OnItemClickListener, LoadJSONTask.Listener  {
 
 
-    public static final String MERCH_URL = "/api/v1/merch/";
+    public static final String MERCH_URL = "/merch/";
     public String URL;
 
     public List<HashMap<String, String>> mAndroidMapList = new ArrayList<>();
     public static final String KEY_ID = "id";
     private static final String KEY_NAME = "name_merch";
     private static final String KEY_COUNT = "merch_count";
-    private static final String KEY_URI ="resource_uri";
+   // private static final String KEY_URI ="resource_uri";
     public ListView MerchListView;
     public ListAdapter adapter;
     Bundle bundle;
@@ -65,21 +66,24 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
 
 
     @Override
-    public void onLoaded(JSONObject response) {
+    public void onLoaded(JSONArray response) {
 
         try {
-            JSONArray object = response.getJSONArray("objects");
-            for (int i = 0; i < object.length(); i++) {
+           // JSONArray object = response.getJSONArray(1);
+            Log.i("onLoaded letring: ", String.valueOf(response.length()));
+            for (int i = 0; i < response.length(); i++) {
                 HashMap<String, String> map = new HashMap<>();
-                JSONObject merch = object.getJSONObject(i);
+                JSONObject merch = response.getJSONObject(i);
+
+
                 String IDm = merch.getString(KEY_ID);
                 map.put(KEY_ID, IDm);
                 String name_merch = merch.getString(KEY_NAME);
                 map.put(KEY_NAME, name_merch);
                 String merch_count = merch.getString(KEY_COUNT);
                 map.put(KEY_COUNT, merch_count);
-                String merch_uri = merch.getString(KEY_URI);
-                map.put(KEY_URI, merch_uri);
+              //  String merch_uri = merch.getString(KEY_URI);
+             //   map.put(KEY_URI, merch_uri);
 
                 mAndroidMapList.add(map);
             }
@@ -100,15 +104,15 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         //Toast.makeText(getActivity(), mAndroidMapList.get(i).get(KEY_URI),Toast.LENGTH_SHORT).show();
-        onClickListView.clickListView(mAndroidMapList.get(i).get(KEY_URI));
+        onClickListView.clickListView(mAndroidMapList.get(i).get(KEY_ID));
     }
 
 
     private void loadListView() {
 
         adapter = new SimpleAdapter(getActivity(), mAndroidMapList, R.layout.listview,
-                new String[] { KEY_ID, KEY_NAME, KEY_COUNT, KEY_URI },
-                new int[] { R.id.merchid, R.id.merchname, R.id.merchcount, R.id.link });
+                new String[] { KEY_ID, KEY_NAME, KEY_COUNT },
+                new int[] { R.id.merchid, R.id.merchname, R.id.merchcount});
         MerchListView.setAdapter(adapter);
     }
 
