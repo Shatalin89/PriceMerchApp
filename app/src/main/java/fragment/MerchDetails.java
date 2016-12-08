@@ -84,6 +84,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         bundle = getArguments();
         URL_ID = bundle.getString("URL_ID");
         MODE_STATUS = bundle.getString("MODE_STATUS");
+        Log.i("onCreateView: ", "view continue"+MODE_STATUS);
         addDataJsonRequest = new JSONRequest();
         imageView = (ImageView) v.findViewById(R.id.ViewMerchImage);
         //инициализация всех элементов интерфейса
@@ -96,6 +97,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         if (MODE_STATUS == "VIEW") {
             setElementStatus = "disable";
             new LoadJSONTask(this).execute(URL_ID);
+
         } else if (MODE_STATUS == "EDIT") {
             enableEdit();
         } else if (MODE_STATUS == "ADD") {
@@ -142,7 +144,6 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
-
         // Операции для выбранного пункта меню
         switch (id) {
             case R.id.action_edit:
@@ -185,18 +186,22 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
     public void onLoaded(JSONArray response) {
 
         Log.i("LENGHT onLoaded: ", String.valueOf(response.length()));
-     /*   try {
-            id = response.getString("id");
-            nameMerch = response.getString("name_merch");
-            enabledMerch = response.getBoolean("merch_enabled");
-            deleteMerch = response.getBoolean("merch_del");
-            countMerch = response.getInt("merch_count");
-            priceMerch = response.getInt("merch_price");
-            merchDescription = response.getString("merch_description");
+        try {
+            JSONObject mercher = new JSONObject(String.valueOf(response));
+            for (int i = 0; i < response.length(); i++){
+
+                id = mercher.getString("id");
+                nameMerch = mercher.getString("name_merch");
+                enabledMerch = mercher.getBoolean("merch_enabled");
+                deleteMerch = mercher.getBoolean("merch_del");
+                countMerch = mercher.getInt("merch_count");
+                priceMerch = mercher.getInt("merch_price");
+                merchDescription = mercher.getString("merch_description");
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        setEditable(setNameMerch, setElementStatus, nameMerch);
+      /*  setEditable(setNameMerch, setElementStatus, nameMerch);
         setEditable(setPriceMerch, setElementStatus, String.valueOf(priceMerch));
         setEditable(setDescriptionMerch, setElementStatus, merchDescription);
         setEnabledCheckBox.setChecked(enabledMerch);

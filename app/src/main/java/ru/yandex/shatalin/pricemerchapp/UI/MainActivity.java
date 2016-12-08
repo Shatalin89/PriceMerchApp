@@ -45,7 +45,7 @@ import ru.yandex.shatalin.pricemerchapp.R;
 public class MainActivity extends Activity implements MerchView.onClickListView, MerchDetails.onClickOkButton, MerchDetails.onClickImageView {
 
     public String URLM;
-    private static final String GET_MERCH = "/merch/";
+    private static final String GET_MERCH = "/mercher/";
 
     public MerchView FragMerchView;
     public MerchDetails FragMerchDetails;
@@ -59,7 +59,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         super.onCreate(savedInstanceState);
         //setContentView(ClassLoader.getSystemResourceAsStream());
         //задали адрес хоста
-        URLM = "http://192.168.1.10:8008";
+        URLM = "http://192.168.1.140:8008";
         //
         setContentView(R.layout.activity_main);
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -87,14 +87,15 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
     //процедура вывода фрагмента с детальным описание товара
 
     @Override
-    public void clickListView(String URL_ID){
+    public void clickListView(String URL_ID) {
         FragMerchDetails = new MerchDetails();
-        bundle.putString("URL_ID", URLM+URL_ID);
+        bundle.putString("URL_ID", URLM + URL_ID);
         bundle.putString("MODE_STATUS", "VIEW");
         FragMerchDetails.setArguments(bundle);
         transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.frgmCont, FragMerchDetails);
         transaction.commit();
+        Log.i("clickListView: ", "нажаите произведено");
     }
 
     //процедура добавление нового элемента
@@ -252,7 +253,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.server1).setCheckable(true);
-        Log.i("URLM start:", URLM);
         return true;
     }
 }
