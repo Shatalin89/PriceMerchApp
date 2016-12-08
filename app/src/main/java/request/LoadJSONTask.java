@@ -30,7 +30,6 @@ public class LoadJSONTask extends AsyncTask<String, Void, JSONArray> {
 
     @Override
     protected JSONArray doInBackground(String... strings) {
-
         String stringResponse = null;
         try {
             stringResponse = loadJSON(strings[0]);

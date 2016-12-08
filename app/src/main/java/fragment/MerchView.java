@@ -41,10 +41,10 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
     public static final String KEY_ID = "id";
     private static final String KEY_NAME = "name_merch";
     private static final String KEY_COUNT = "merch_count";
-   // private static final String KEY_URI ="resource_uri";
     public ListView MerchListView;
     public ListAdapter adapter;
     Bundle bundle;
+    //интерфейс для вывода детальной информации о товаре
     public interface onClickListView {
         void clickListView(String URL_ID);
     }

@@ -45,8 +45,7 @@ import ru.yandex.shatalin.pricemerchapp.R;
 public class MainActivity extends Activity implements MerchView.onClickListView, MerchDetails.onClickOkButton, MerchDetails.onClickImageView {
 
     public String URLM;
-    private static final String URL_MERCH = "/merch/";
-
+    private static final String GET_MERCH = "/merch/";
 
     public MerchView FragMerchView;
     public MerchDetails FragMerchDetails;
@@ -54,18 +53,21 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
     public FragmentTransaction transaction;
     private Bundle bundle;
 
-
+    //Создание главной активити
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(ClassLoader.getSystemResourceAsStream());
+        //задали адрес хоста
         URLM = "http://192.168.1.10:8008";
+        //
         setContentView(R.layout.activity_main);
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
         bundle = new Bundle();
+        //стартуем фрагмент со списком товаров
         startFragement();
     }
 
@@ -82,6 +84,8 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         transaction.commit();
     }
 
+    //процедура вывода фрагмента с детальным описание товара
+
     @Override
     public void clickListView(String URL_ID){
         FragMerchDetails = new MerchDetails();
@@ -93,9 +97,10 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         transaction.commit();
     }
 
+    //процедура добавление нового элемента
     public void addClickMerchView(View view) {
         FragMerchDetails = new MerchDetails();
-        bundle.putString("URL_ID", URLM+URL_MERCH);
+        bundle.putString("URL_ID", URLM+GET_MERCH);
         bundle.putString("MODE_STATUS", "ADD");
         FragMerchDetails.setArguments(bundle);
         transaction = getFragmentManager().beginTransaction();
@@ -108,6 +113,8 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         startFragement();
     }
 
+
+    //процедура добавление картинки из галереи в имейдж вью
     @Override
     public Bitmap clickImageView(Intent imageReturnedIntent){
         try {
@@ -124,7 +131,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
             Log.i("filePath: ", filePath);
             cursor.close();
             Log.i("clickImageView: ", imageUri.getPath());
-            doFileUpload(filePath);
+           // doFileUpload(filePath);
             final InputStream imageStream;
             imageStream = getContentResolver().openInputStream(imageUri);
             final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
@@ -135,6 +142,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         }
     }
 
+    //типа будем пытаться аплоадить картинку на сервер
     public void doFileUpload(String path){
         HttpURLConnection conn = null;
         DataOutputStream dos = null;
@@ -216,6 +224,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         }
     }
 
+    //меню итем выбираем сервак
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -232,7 +241,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
                 return super.onOptionsItemSelected(item);
         }
     }
-
+//создание меню итем
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
