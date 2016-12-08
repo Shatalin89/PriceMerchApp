@@ -33,7 +33,7 @@ public class LoadJSONTask extends AsyncTask<String, Void, JSONArray> {
         String stringResponse = null;
         try {
             stringResponse = loadJSON(strings[0]);
-
+            Log.e("doInBackground: ", stringResponse);
             JSONArray response =  new JSONArray(stringResponse);
             return response;
         } catch (IOException e) {

@@ -187,6 +187,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
 
         Log.i("LENGHT onLoaded: ", String.valueOf(response.length()));
         try {
+            Log.i("begin pars onLoaded: ", String.valueOf(response));
             JSONObject mercher = new JSONObject(String.valueOf(response));
             for (int i = 0; i < response.length(); i++){
 
