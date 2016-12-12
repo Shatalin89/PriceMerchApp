@@ -26,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import request.JSONRequest;
+import request.LoadJSONObject;
 import request.LoadJSONTask;
 import request.PostJSONTask;
 import ru.yandex.shatalin.pricemerchapp.R;
@@ -33,7 +34,7 @@ import ru.yandex.shatalin.pricemerchapp.R;
 import static android.app.Activity.RESULT_OK;
 
 
-public class MerchDetails extends Fragment implements LoadJSONTask.Listener, PostJSONTask.Listener {
+public class MerchDetails extends Fragment implements LoadJSONObject.Listener, PostJSONTask.Listener {
 
 
     public interface onClickOkButton {
@@ -96,7 +97,7 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
 
         if (MODE_STATUS == "VIEW") {
             setElementStatus = "disable";
-            new LoadJSONTask(this).execute(URL_ID);
+            new LoadJSONObject(this).execute(URL_ID);
 
         } else if (MODE_STATUS == "EDIT") {
             enableEdit();
@@ -182,31 +183,26 @@ public class MerchDetails extends Fragment implements LoadJSONTask.Listener, Pos
         }
     }
 
+    //заполняем элементы данными
     @Override
-    public void onLoaded(JSONArray response) {
-
-        Log.i("LENGHT onLoaded: ", String.valueOf(response.length()));
+    public void onLoaded(JSONObject response) {
         try {
-            Log.i("begin pars onLoaded: ", String.valueOf(response));
-            JSONObject mercher = new JSONObject(String.valueOf(response));
-            for (int i = 0; i < response.length(); i++){
-
-                id = mercher.getString("id");
-                nameMerch = mercher.getString("name_merch");
-                enabledMerch = mercher.getBoolean("merch_enabled");
-                deleteMerch = mercher.getBoolean("merch_del");
-                countMerch = mercher.getInt("merch_count");
-                priceMerch = mercher.getInt("merch_price");
-                merchDescription = mercher.getString("merch_description");
-            }
+            id = response.getString("id");
+            nameMerch = response.getString("name_merch");
+            enabledMerch = response.getBoolean("merch_enabled");
+            deleteMerch = response.getBoolean("merch_del");
+            countMerch = response.getInt("merch_count");
+            priceMerch = response.getInt("merch_price");
+            merchDescription = response.getString("merch_description");
         } catch (JSONException e) {
             e.printStackTrace();
         }
-      /*  setEditable(setNameMerch, setElementStatus, nameMerch);
+        setEditable(setNameMerch, setElementStatus, nameMerch);
         setEditable(setPriceMerch, setElementStatus, String.valueOf(priceMerch));
         setEditable(setDescriptionMerch, setElementStatus, merchDescription);
         setEnabledCheckBox.setChecked(enabledMerch);
-        setDeletedCheckBox.setChecked(deleteMerch);*/
+        setDeletedCheckBox.setChecked(deleteMerch);
+
     }
 
     @Override

@@ -1,6 +1,5 @@
 package request;
 
-
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -14,30 +13,34 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import fragment.MerchDetails;
 
-public class LoadJSONTask extends AsyncTask<String, Void, JSONArray> {
 
-    public LoadJSONTask(Listener listener) {
+public class LoadJSONObject extends AsyncTask<String, Void, JSONObject> {
+
+    public LoadJSONObject(LoadJSONObject.Listener listener) {
         mListener = listener;
     }
 
+
+
     public interface Listener {
-        void onLoaded(JSONArray response);
+        void onLoaded(JSONObject response);
         void onError();
     }
 
-    private Listener mListener;
+    private LoadJSONObject.Listener mListener;
 
     @Override
-    protected JSONArray doInBackground(String... strings) {
+    protected JSONObject doInBackground(String... strings) {
         String stringResponse = null;
         try {
             stringResponse = loadJSON(strings[0]);
             Log.e("doInBackground: ", stringResponse);
 
-         //   JSONObject res  = new JSONObject(stringResponse);
-          //  Log.i("jsonobgect doInBack", res.toString());
-            JSONArray response =  new JSONArray(stringResponse);
+            //   JSONObject res  = new JSONObject(stringResponse);
+            //  Log.i("jsonobgect doInBack", res.toString());
+            JSONObject response =  new JSONObject(stringResponse);
             return response;
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,7 +52,7 @@ public class LoadJSONTask extends AsyncTask<String, Void, JSONArray> {
     }
 
     @Override
-    protected void onPostExecute(JSONArray response) {
+    protected void onPostExecute(JSONObject response) {
         Log.i("response: ", response.toString());
         if (response != null) {
             mListener.onLoaded(response);
@@ -82,3 +85,4 @@ public class LoadJSONTask extends AsyncTask<String, Void, JSONArray> {
     }
 
 }
+
