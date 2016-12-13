@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ParseException;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.provider.MediaStore;
@@ -26,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -33,6 +35,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -59,7 +62,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         super.onCreate(savedInstanceState);
         //setContentView(ClassLoader.getSystemResourceAsStream());
         //задали адрес хоста
-        URLM = "http://192.168.1.140:8008";
+        URLM = "http://192.168.1.10:8008";
         //
         setContentView(R.layout.activity_main);
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -117,12 +120,12 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
 
     //процедура добавление картинки из галереи в имейдж вью
     @Override
-    public Bitmap clickImageView(Intent imageReturnedIntent){
+    public Bitmap clickImageView(Intent imageReturnedIntent) {
         try {
             Uri imageUri = imageReturnedIntent.getData();
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
             Log.i("filePathColumn: ", filePathColumn[0]);
-            Cursor cursor  = getContentResolver().query(imageUri, filePathColumn, null, null, null);
+            Cursor cursor = getContentResolver().query(imageUri, filePathColumn, null, null, null);
             Log.i("cursor: ", cursor.toString());
             cursor.moveToFirst();
             Log.i("cursor: ", cursor.toString());
@@ -132,7 +135,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
             Log.i("filePath: ", filePath);
             cursor.close();
             Log.i("clickImageView: ", imageUri.getPath());
-           // doFileUpload(filePath);
+            multipartRequest(URLM + "/merch/photo/", "idmerch=1&phototype=m&name=", filePath, "image");
             final InputStream imageStream;
             imageStream = getContentResolver().openInputStream(imageUri);
             final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
@@ -140,90 +143,120 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
+    //<пример аплоада>
+    public String multipartRequest(String urlTo, String post, String filepath, String filefield) throws ParseException, IOException {
+        HttpURLConnection connection = null;
+        DataOutputStream outputStream = null;
+        InputStream inputStream = null;
 
-    //типа будем пытаться аплоадить картинку на сервер
-    public void doFileUpload(String path){
-        HttpURLConnection conn = null;
-        DataOutputStream dos = null;
-        DataInputStream inStream = null;
+        String twoHyphens = "--";
+        String boundary =  "*****"+Long.toString(System.currentTimeMillis())+"*****";
         String lineEnd = "\r\n";
+
+        String result = "";
+
         int bytesRead, bytesAvailable, bufferSize;
         byte[] buffer;
         int maxBufferSize = 1*1024*1024;
-        String urlString = URLM+"/merch/photo/";   // server ip
-        try
-        {
-            //------------------ CLIENT REQUEST
-            FileInputStream fileInputStream = new FileInputStream(new File(path) );
-            // open a URL connection to the Servlet
-            URL url = new URL(urlString);
-            // Open a HTTP connection to the URL
-            conn = (HttpURLConnection) url.openConnection();
-            // Allow Inputs
-            conn.setDoInput(true);
-            // Allow Outputs
-            conn.setDoOutput(true);
-            // Don't use a cached copy.
-            conn.setUseCaches(false);
-            // Use a post method.
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Connection", "Keep-Alive");
-            conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+"    ");
-            dos = new DataOutputStream( conn.getOutputStream() );
-            dos.writeBytes(lineEnd);
-            dos.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\"" + path + "\"" + lineEnd);
-            dos.writeBytes(lineEnd);
 
-            // create a buffer of maximum size
+        String[] q = filepath.split("/");
+        int idx = q.length - 1;
+        Log.i( "multipartRequest: ", String.valueOf(idx));
+        try {
+            File file = new File(filepath);
+            FileInputStream fileInputStream = new FileInputStream(file);
+
+            URL url = new URL(urlTo);
+            connection = (HttpURLConnection) url.openConnection();
+
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setUseCaches(false);
+
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Connection", "Keep-Alive");
+            connection.setRequestProperty("User-Agent", "Android Multipart HTTP Client 1.0");
+            connection.setRequestProperty("Content-Type", "multipart/form-data; boundary="+boundary);
+
+            outputStream = new DataOutputStream(connection.getOutputStream());
+            outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+            outputStream.writeBytes("Content-Disposition: form-data; name=\"" + filefield + "\"; filename=\"" + q[idx] +"\"" + lineEnd);
+            outputStream.writeBytes("Content-Type: image/jpeg" + lineEnd);
+            outputStream.writeBytes("Content-Transfer-Encoding: binary" + lineEnd);
+            outputStream.writeBytes(lineEnd);
+
             bytesAvailable = fileInputStream.available();
             bufferSize = Math.min(bytesAvailable, maxBufferSize);
             buffer = new byte[bufferSize];
 
-            // read file and write it into form...
             bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-            while (bytesRead > 0)
-            {
-                dos.write(buffer, 0, bufferSize);
+            while(bytesRead > 0) {
+                outputStream.write(buffer, 0, bufferSize);
                 bytesAvailable = fileInputStream.available();
                 bufferSize = Math.min(bytesAvailable, maxBufferSize);
                 bytesRead = fileInputStream.read(buffer, 0, bufferSize);
             }
 
-            // send multipart form data necesssary after file data...
-            dos.writeBytes(lineEnd);
-            dos.writeBytes(lineEnd);
-
-            // close streams
-            Log.e("Debug","File is written");
-            fileInputStream.close();
-            dos.flush();
-            dos.close();
-        }
-        catch (MalformedURLException ex)
-        {
-            Log.e("Debug", "error: " + ex.getMessage(), ex);
-        }
-        catch (IOException ioe)
-        {
-            Log.e("Debug", "error: " + ioe.getMessage(), ioe);
-        }
-
-        //------------------ read the SERVER RESPONSE
-        try {
-            inStream = new DataInputStream ( conn.getInputStream() );
-            String str;
-            while (( str = inStream.readLine()) != null)
-            {
-                Log.e("Debug","Server Response "+str);
+            outputStream.writeBytes(lineEnd);
+            // Upload POST Data
+            String data = post+q[idx];
+            String[] posts = data.split("&");
+            int max = posts.length;
+            for(int i=0; i<max;i++) {
+                outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+                String[] kv = posts[i].split("=");
+                Log.i("multipartRequest: ", kv[0]+" "+kv[1]);
+                outputStream.writeBytes("Content-Disposition: form-data; name=\"" + kv[0] + "\"" + lineEnd);
+                outputStream.writeBytes("Content-Type: text/plain"+lineEnd);
+                outputStream.writeBytes(lineEnd);
+                outputStream.writeBytes(kv[1]);
+                outputStream.writeBytes(lineEnd);
             }
-            inStream.close();
-        }
-        catch (IOException ioex){
-            Log.e("Debug", "error: " + ioex.getMessage(), ioex);
+
+            outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+            inputStream = connection.getInputStream();
+            result = this.convertStreamToString(inputStream);
+
+            fileInputStream.close();
+            inputStream.close();
+            outputStream.flush();
+            outputStream.close();
+            Log.i("result=", result.toString());
+            return result;
+        } catch(Exception e) {
+            Log.e("MultipartRequest","Multipart Form Upload Error");
+            e.printStackTrace();
+            return "error";
         }
     }
+
+    private String convertStreamToString(InputStream is) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
+    }
+    //</пример аплоада>
 
     //меню итем выбираем сервак
     @Override

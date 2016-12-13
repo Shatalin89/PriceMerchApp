@@ -43,13 +43,9 @@ public class PostJSONTask extends AsyncTask<JSONRequest, Void, String> {
             conn.setRequestMethod(typeRequest);
             conn.setDoInput (true);
             conn.setDoOutput (true);
-
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Accept", "application/json");
-            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-            Log.i("my json", jsonObject.toString());
-            Log.i("URL_ID_async", urlResponse);
-
+            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());          ;
             OutputStream os = conn.getOutputStream();
             BufferedWriter writer = new BufferedWriter(
                     new OutputStreamWriter(os, "UTF-8"));
@@ -86,17 +82,13 @@ public class PostJSONTask extends AsyncTask<JSONRequest, Void, String> {
     @Override
     protected String doInBackground(JSONRequest... jsonRequests) {
         String statusRequest;
-
         JSONPost(jsonRequests[0]);
         statusRequest = "OK";
         return statusRequest;
-
-        //return null;
     }
 
     @Override
     protected void onPostExecute(String statusRequest) {
-
         if (statusRequest == "OK") {
             mListener.onOk(statusRequest);
         } else {

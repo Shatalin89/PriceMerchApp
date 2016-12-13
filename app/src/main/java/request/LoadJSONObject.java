@@ -36,10 +36,6 @@ public class LoadJSONObject extends AsyncTask<String, Void, JSONObject> {
         String stringResponse = null;
         try {
             stringResponse = loadJSON(strings[0]);
-            Log.e("doInBackground: ", stringResponse);
-
-            //   JSONObject res  = new JSONObject(stringResponse);
-            //  Log.i("jsonobgect doInBack", res.toString());
             JSONObject response =  new JSONObject(stringResponse);
             return response;
         } catch (IOException e) {
@@ -53,7 +49,6 @@ public class LoadJSONObject extends AsyncTask<String, Void, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject response) {
-        Log.i("response: ", response.toString());
         if (response != null) {
             mListener.onLoaded(response);
         } else {
@@ -62,7 +57,6 @@ public class LoadJSONObject extends AsyncTask<String, Void, JSONObject> {
     }
 
     private String loadJSON(String jsonURL) throws IOException {
-        Log.i("loadJSON: ", jsonURL);
         URL url = new URL(jsonURL);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setReadTimeout(10000);
@@ -70,11 +64,9 @@ public class LoadJSONObject extends AsyncTask<String, Void, JSONObject> {
         conn.setRequestMethod("GET");
         conn.setDoInput(true);
         conn.connect();
-
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         String line;
         StringBuilder response = new StringBuilder();
-
         while ((line = in.readLine()) != null)
         {
             response.append(line);

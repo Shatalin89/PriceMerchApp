@@ -3,11 +3,8 @@ package request;
 
 import android.os.AsyncTask;
 import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,10 +30,6 @@ public class LoadJSONTask extends AsyncTask<String, Void, JSONArray> {
         String stringResponse = null;
         try {
             stringResponse = loadJSON(strings[0]);
-            Log.e("doInBackground: ", stringResponse);
-
-         //   JSONObject res  = new JSONObject(stringResponse);
-          //  Log.i("jsonobgect doInBack", res.toString());
             JSONArray response =  new JSONArray(stringResponse);
             return response;
         } catch (IOException e) {
@@ -50,7 +43,6 @@ public class LoadJSONTask extends AsyncTask<String, Void, JSONArray> {
 
     @Override
     protected void onPostExecute(JSONArray response) {
-        Log.i("response: ", response.toString());
         if (response != null) {
             mListener.onLoaded(response);
         } else {
@@ -59,7 +51,6 @@ public class LoadJSONTask extends AsyncTask<String, Void, JSONArray> {
     }
 
     private String loadJSON(String jsonURL) throws IOException {
-        Log.i("loadJSON: ", jsonURL);
         URL url = new URL(jsonURL);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setReadTimeout(10000);
@@ -67,16 +58,13 @@ public class LoadJSONTask extends AsyncTask<String, Void, JSONArray> {
         conn.setRequestMethod("GET");
         conn.setDoInput(true);
         conn.connect();
-
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         String line;
         StringBuilder response = new StringBuilder();
-
         while ((line = in.readLine()) != null)
         {
             response.append(line);
         }
-
         in.close();
         return response.toString();
     }

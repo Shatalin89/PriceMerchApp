@@ -36,7 +36,6 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
 
     public static final String MERCH_URL = "/mercher/";
     public String URL;
-
     public List<HashMap<String, String>> mAndroidMapList = new ArrayList<>();
     public static final String KEY_ID = "id";
     private static final String KEY_NAME = "name_merch";
@@ -62,8 +61,6 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
         Loadvoid();
         return v;
     }
-
-
 
     @Override
     public void onLoaded(JSONArray response) {
