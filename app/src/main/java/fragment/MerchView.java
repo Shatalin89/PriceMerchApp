@@ -4,6 +4,8 @@ package fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -16,6 +18,9 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 
 import org.json.JSONArray;
@@ -59,7 +64,7 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
         MerchListView = (ListView) v.findViewById(R.id.merchView);
         MerchListView.setOnItemClickListener(this);
         bundle = getArguments();
-        URL=bundle.getString("URL");
+        URL = bundle.getString("URL");
         Loadvoid();
         return v;
     }
@@ -68,7 +73,7 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
     public void onLoaded(JSONArray response) {
 
         try {
-            Log.i("onLoaded letring: ", String.valueOf(response.length()));
+            Log.i("onLoaded letring: ", response.toString());
             for (int i = 0; i < response.length(); i++) {
                 HashMap<String, String> map = new HashMap<>();
                 JSONObject merch = response.getJSONObject(i);
@@ -80,20 +85,22 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
                 map.put(KEY_NAME, name_merch);
                 String merch_count = merch.getString(KEY_COUNT);
                 map.put(KEY_COUNT, merch_count);
-                int photo_default = merch.getInt("photo_default");
+                Log.i("onLoaded: ", name_merch+" "+IDm+" "+merch_count);
+                int photo_default = 3;
                 JSONArray photos = merch.getJSONArray("photos");
 
                 for (int j=0; j<photos.length(); j++){
                     JSONObject image = photos.getJSONObject(j);
                     int idphoto = image.getInt(KEY_ID);
-                    if (photo_default == idphoto) {
+                    if (photo_default == 3) {
                         uri_image = image.getString(KEY_IMAGE);
                         name_image = image.getString(KEY_NAME_IMAGE);
                     } else {
-                        uri_image = "http://192.168.1.10:8008/media/images/no_image.jpg";
+                        uri_image = "http://192.168.1.140:8008/media/images/no_image.jpg";
                         name_image = "no_image";
                     }
-                    map.put(KEY_IMAGE, uri_image);
+
+                    map.put(KEY_IMAGE, String.valueOf(getbmpfromURL(uri_image)));
                     map.put(KEY_NAME_IMAGE, name_image);
                 }
                 mAndroidMapList.add(map);
@@ -140,7 +147,21 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
             throw new ClassCastException(activity.toString()
                     + " must implement OnHeadlineSelectedListener");
         }
-
     }
 
+    public Bitmap getbmpfromURL(String surl){
+        try {
+            URL url = new URL(surl);
+            HttpURLConnection urlcon = (HttpURLConnection) url.openConnection();
+            urlcon.setDoInput(true);
+            urlcon.connect();
+            InputStream in = urlcon.getInputStream();
+            Bitmap mIcon = BitmapFactory.decodeStream(in);
+            return  mIcon;
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

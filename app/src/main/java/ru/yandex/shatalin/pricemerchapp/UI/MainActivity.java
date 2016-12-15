@@ -48,7 +48,7 @@ import ru.yandex.shatalin.pricemerchapp.R;
 public class MainActivity extends Activity implements MerchView.onClickListView, MerchDetails.onClickOkButton, MerchDetails.onClickImageView {
 
     public String URLM;
-    private static final String GET_MERCH = "/mercher/";
+    private static final String GET_MERCH = "/merch/";
     private static final String PHOTO = "/merch/photo/";
 
 
@@ -64,7 +64,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         super.onCreate(savedInstanceState);
         //setContentView(ClassLoader.getSystemResourceAsStream());
         //задали адрес хоста
-        URLM = "http://192.168.1.10:8008";
+        URLM = "http://192.168.1.140:8008";
         //
         setContentView(R.layout.activity_main);
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -158,7 +158,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
 
         String[] q = filepath.split("/");
         int idx = q.length - 1;
-        Log.i( "multipartRequest: ", String.valueOf(idx));
         try {
             File file = new File(filepath);
             FileInputStream fileInputStream = new FileInputStream(file);
@@ -169,12 +168,10 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
             connection.setDoInput(true);
             connection.setDoOutput(true);
             connection.setUseCaches(false);
-
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Connection", "Keep-Alive");
             connection.setRequestProperty("User-Agent", "Android Multipart HTTP Client 1.0");
             connection.setRequestProperty("Content-Type", "multipart/form-data; boundary="+boundary);
-
             outputStream = new DataOutputStream(connection.getOutputStream());
             outputStream.writeBytes(twoHyphens + boundary + lineEnd);
             outputStream.writeBytes("Content-Disposition: form-data; name=\"" + filefield + "\"; filename=\"" + q[idx] +"\"" + lineEnd);
@@ -201,7 +198,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
             for(int i=0; i<max;i++) {
                 outputStream.writeBytes(twoHyphens + boundary + lineEnd);
                 String[] kv = posts[i].split("=");
-                Log.i("multipartRequest: ", kv[0]+" "+kv[1]);
                 outputStream.writeBytes("Content-Disposition: form-data; name=\"" + kv[0] + "\"" + lineEnd);
                 outputStream.writeBytes("Content-Type: text/plain"+lineEnd);
                 outputStream.writeBytes(lineEnd);
@@ -216,7 +212,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
             inputStream.close();
             outputStream.flush();
             outputStream.close();
-            Log.i("result=", result.toString());
             return result;
         } catch(Exception e) {
             Log.e("MultipartRequest","Multipart Form Upload Error");
