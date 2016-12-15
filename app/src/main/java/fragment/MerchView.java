@@ -4,6 +4,8 @@ package fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -22,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -119,8 +122,8 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
 
     private void loadListView() {
         adapter = new SimpleAdapter(getActivity(), mAndroidMapList, R.layout.listview,
-                new String[] { KEY_ID, KEY_NAME, KEY_COUNT },
-                new int[] { R.id.merchid, R.id.merchname, R.id.merchcount});
+                new String[] { KEY_ID, KEY_NAME, KEY_COUNT , KEY_IMAGE},
+                new int[] { R.id.merchid, R.id.merchname, R.id.merchcount, R.id.imageView});
         MerchListView.setAdapter(adapter);
     }
 
