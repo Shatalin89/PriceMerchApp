@@ -49,6 +49,8 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
 
     public String URLM;
     private static final String GET_MERCH = "/mercher/";
+    private static final String PHOTO = "/merch/photo/";
+
 
     public MerchView FragMerchView;
     public MerchDetails FragMerchDetails;
@@ -88,7 +90,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
     }
 
     //процедура вывода фрагмента с детальным описание товара
-
     @Override
     public void clickListView(String URL_ID) {
         FragMerchDetails = new MerchDetails();
@@ -100,7 +101,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         transaction.commit();
         Log.i("clickListView: ", "нажаите произведено");
     }
-
     //процедура добавление нового элемента
     public void addClickMerchView(View view) {
         FragMerchDetails = new MerchDetails();
@@ -116,26 +116,18 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
     public void clickOkButton() {
         startFragement();
     }
-
-
     //процедура добавление картинки из галереи в имейдж вью
     @Override
     public Bitmap clickImageView(Intent imageReturnedIntent) {
         try {
             Uri imageUri = imageReturnedIntent.getData();
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
-            Log.i("filePathColumn: ", filePathColumn[0]);
             Cursor cursor = getContentResolver().query(imageUri, filePathColumn, null, null, null);
-            Log.i("cursor: ", cursor.toString());
             cursor.moveToFirst();
-            Log.i("cursor: ", cursor.toString());
             int culumnindex = cursor.getColumnIndex(filePathColumn[0]);
-            Log.i("culumnindex: ", String.valueOf(culumnindex));
             String filePath = cursor.getString(culumnindex);
-            Log.i("filePath: ", filePath);
             cursor.close();
-            Log.i("clickImageView: ", imageUri.getPath());
-            multipartRequest(URLM + "/merch/photo/", "idmerch=1&phototype=m&name=", filePath, "image");
+            multipartRequest(URLM + PHOTO, "idmerch=1&phototype=m&name=", filePath, "image");
             final InputStream imageStream;
             imageStream = getContentResolver().openInputStream(imageUri);
             final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
@@ -201,7 +193,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
                 bufferSize = Math.min(bytesAvailable, maxBufferSize);
                 bytesRead = fileInputStream.read(buffer, 0, bufferSize);
             }
-
             outputStream.writeBytes(lineEnd);
             // Upload POST Data
             String data = post+q[idx];
@@ -219,10 +210,8 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
             }
 
             outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-
             inputStream = connection.getInputStream();
             result = this.convertStreamToString(inputStream);
-
             fileInputStream.close();
             inputStream.close();
             outputStream.flush();
@@ -235,7 +224,6 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
             return "error";
         }
     }
-
     private String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();

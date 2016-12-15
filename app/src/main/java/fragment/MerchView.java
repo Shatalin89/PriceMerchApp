@@ -34,12 +34,14 @@ import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 public class MerchView extends Fragment implements  AdapterView.OnItemClickListener, LoadJSONTask.Listener  {
 
 
-    public static final String MERCH_URL = "/mercher/";
+    public static final String MERCH_URL = "/merch/";
     public String URL;
     public List<HashMap<String, String>> mAndroidMapList = new ArrayList<>();
     public static final String KEY_ID = "id";
     private static final String KEY_NAME = "name_merch";
     private static final String KEY_COUNT = "merch_count";
+    private static final String KEY_IMAGE = "image";
+    private static final String KEY_NAME_IMAGE = "name";
     public ListView MerchListView;
     public ListAdapter adapter;
     Bundle bundle;
@@ -70,12 +72,30 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
             for (int i = 0; i < response.length(); i++) {
                 HashMap<String, String> map = new HashMap<>();
                 JSONObject merch = response.getJSONObject(i);
+                String uri_image;
+                String name_image;
                 String IDm = merch.getString(KEY_ID);
                 map.put(KEY_ID, IDm);
                 String name_merch = merch.getString(KEY_NAME);
                 map.put(KEY_NAME, name_merch);
                 String merch_count = merch.getString(KEY_COUNT);
                 map.put(KEY_COUNT, merch_count);
+                int photo_default = merch.getInt("photo_default");
+                JSONArray photos = merch.getJSONArray("photos");
+
+                for (int j=0; j<photos.length(); j++){
+                    JSONObject image = photos.getJSONObject(j);
+                    int idphoto = image.getInt(KEY_ID);
+                    if (photo_default == idphoto) {
+                        uri_image = image.getString(KEY_IMAGE);
+                        name_image = image.getString(KEY_NAME_IMAGE);
+                    } else {
+                        uri_image = "http://192.168.1.10:8008/media/images/no_image.jpg";
+                        name_image = "no_image";
+                    }
+                    map.put(KEY_IMAGE, uri_image);
+                    map.put(KEY_NAME_IMAGE, name_image);
+                }
                 mAndroidMapList.add(map);
             }
 

@@ -51,14 +51,16 @@ public class MerchDetails extends Fragment implements LoadJSONObject.Listener, P
     public String URL_ID;
     public EditText setNameMerch, setPriceMerch, setDescriptionMerch;
     public CheckBox setEnabledCheckBox, setDeletedCheckBox;
-    public
+
     String id;
     String nameMerch;
     int priceMerch;
     boolean enabledMerch;
     boolean deleteMerch;
     int countMerch;
+    int defaultPhoto;
     String merchDescription;
+    String[][] photosMerch;
     public String MODE_STATUS;
     public String setElementStatus;
     Bundle bundle;
@@ -85,7 +87,6 @@ public class MerchDetails extends Fragment implements LoadJSONObject.Listener, P
         bundle = getArguments();
         URL_ID = bundle.getString("URL_ID");
         MODE_STATUS = bundle.getString("MODE_STATUS");
-        Log.i("onCreateView: ", "view continue"+MODE_STATUS);
         addDataJsonRequest = new JSONRequest();
         imageView = (ImageView) v.findViewById(R.id.ViewMerchImage);
         //инициализация всех элементов интерфейса
@@ -98,7 +99,6 @@ public class MerchDetails extends Fragment implements LoadJSONObject.Listener, P
         if (MODE_STATUS == "VIEW") {
             setElementStatus = "disable";
             new LoadJSONObject(this).execute(URL_ID);
-
         } else if (MODE_STATUS == "EDIT") {
             enableEdit();
         } else if (MODE_STATUS == "ADD") {
@@ -128,7 +128,6 @@ public class MerchDetails extends Fragment implements LoadJSONObject.Listener, P
 
                                              //Запускаем переход с ожиданием обратного результата в виде информации об изображении:
                                              startActivityForResult(photoPickerIntent, Pick_image);
-                                             Log.e("Click IMAGE", "проверяй");
                                          }
                                      }
         );
@@ -186,6 +185,7 @@ public class MerchDetails extends Fragment implements LoadJSONObject.Listener, P
     //заполняем элементы данными
     @Override
     public void onLoaded(JSONObject response) {
+
         try {
             id = response.getString("id");
             nameMerch = response.getString("name_merch");
@@ -193,7 +193,16 @@ public class MerchDetails extends Fragment implements LoadJSONObject.Listener, P
             deleteMerch = response.getBoolean("merch_del");
             countMerch = response.getInt("merch_count");
             priceMerch = response.getInt("merch_price");
+            defaultPhoto = response.getInt("photo_default");
             merchDescription = response.getString("merch_description");
+            JSONArray photos = response.getJSONArray("photos");
+            for (int i=0; i<photos.length(); i++){
+                JSONObject getImage = photos.getJSONObject(i);
+                photosMerch[0][i] = getImage.getString("id");
+                photosMerch[1][i] = getImage.getString("image");
+                photosMerch[2][i] = getImage.getString("name");
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -271,6 +280,4 @@ public class MerchDetails extends Fragment implements LoadJSONObject.Listener, P
                 }
         }
     }
-
-
 }
