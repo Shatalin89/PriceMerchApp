@@ -64,7 +64,7 @@ public class MainActivity extends Activity implements MerchView.onClickListView,
         super.onCreate(savedInstanceState);
         //setContentView(ClassLoader.getSystemResourceAsStream());
         //задали адрес хоста
-        URLM = "http://192.168.1.140:8008";
+        URLM = "http://192.168.1.10:8008";
         //
         setContentView(R.layout.activity_main);
         if (android.os.Build.VERSION.SDK_INT > 9) {

@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import request.LoadJSONTask;
 import ru.yandex.shatalin.pricemerchapp.R;
@@ -42,7 +43,7 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
 
     public static final String MERCH_URL = "/merch/";
     public String URL;
-    public List<HashMap<String, String>> mAndroidMapList = new ArrayList<>();
+    public List<HashMap<String, Objects>> mAndroidMapList = new ArrayList<HashMap<String, Object>>();
     public static final String KEY_ID = "id";
     private static final String KEY_NAME = "name_merch";
     private static final String KEY_COUNT = "merch_count";
@@ -74,9 +75,10 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
     public void onLoaded(JSONArray response) {
 
         try {
+            HashMap<String, Objects> map;
             Log.i("onLoaded letring: ", response.toString());
             for (int i = 0; i < response.length(); i++) {
-                HashMap<String, String> map = new HashMap<>();
+                map = new HashMap<String, Object>();
                 JSONObject merch = response.getJSONObject(i);
                 String uri_image;
                 String name_image;
@@ -97,7 +99,7 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
                         uri_image = image.getString(KEY_IMAGE);
                         name_image = image.getString(KEY_NAME_IMAGE);
                     } else {
-                        uri_image = "http://192.168.1.140:8008/media/images/no_image.jpg";
+                        uri_image = "http://192.168.1.10:8008/media/images/no_image.jpg";
                         name_image = "no_image";
                     }
 
