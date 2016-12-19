@@ -49,6 +49,35 @@ public class ImageManager {
         thread.start();
     }
 
+
+    public static Bitmap fetchBitmap(final String iUrl) {
+        if ( iUrl == null )
+            return null;
+
+        final Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message message) {
+                Bitmap image = (Bitmap) message.obj;
+
+            }
+        };
+
+        final Thread thread = new Thread() {
+            @Override
+            public void run() {
+                final Bitmap image = downloadImage(iUrl);
+                if ( image != null ) {
+                    Log.v(TAG, "Got image by URL: " + iUrl);
+                    final Message message = handler.obtainMessage(1, image);
+                    handler.sendMessage(message);
+                }
+            }
+        };
+
+        thread.setPriority(3);
+        thread.start();
+    }
+
     public static Bitmap downloadImage(String iUrl) {
         Bitmap bitmap = null;
         HttpURLConnection conn = null;

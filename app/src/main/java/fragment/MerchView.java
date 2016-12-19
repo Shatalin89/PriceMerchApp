@@ -27,23 +27,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
 
+import request.ImageManager;
 import request.LoadJSONTask;
 import ru.yandex.shatalin.pricemerchapp.R;
-
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 public class MerchView extends Fragment implements  AdapterView.OnItemClickListener, LoadJSONTask.Listener  {
 
 
     public static final String MERCH_URL = "/merch/";
     public String URL;
-    public List<HashMap<String, Objects>> mAndroidMapList = new ArrayList<HashMap<String, Object>>();
+    public ArrayList<HashMap<String, Object>> mAndroidMapList = new ArrayList<HashMap<String, Object>>();
     public static final String KEY_ID = "id";
     private static final String KEY_NAME = "name_merch";
     private static final String KEY_COUNT = "merch_count";
@@ -75,37 +71,48 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
     public void onLoaded(JSONArray response) {
 
         try {
-            HashMap<String, Objects> map;
+            HashMap<String, Object> map;
             Log.i("onLoaded letring: ", response.toString());
-            for (int i = 0; i < response.length(); i++) {
+
+            int[] IDm = new int[20]; // массив айдишников
+            String[] name_merch = new String[20];//массив названий
+            int[] merch_count = new int[20];
+            Bitmap[] image = new Bitmap[20];//массив картинок
+            String[] URIImage = new String[20];
+            int[] idImage = new int[20];
+
+            for (int i=0; i<response.length(); i++){
                 map = new HashMap<String, Object>();
                 JSONObject merch = response.getJSONObject(i);
-                String uri_image;
-                String name_image;
-                String IDm = merch.getString(KEY_ID);
-                map.put(KEY_ID, IDm);
-                String name_merch = merch.getString(KEY_NAME);
-                map.put(KEY_NAME, name_merch);
-                String merch_count = merch.getString(KEY_COUNT);
-                map.put(KEY_COUNT, merch_count);
-                Log.i("onLoaded: ", name_merch+" "+IDm+" "+merch_count);
-                int photo_default = 3;
+
+                IDm[i] = merch.getInt(KEY_ID);
+                name_merch[i] = merch.getString(KEY_NAME);
+                merch_count[i] = merch.getInt(KEY_COUNT);
                 JSONArray photos = merch.getJSONArray("photos");
-
+                Log.i("photso"+i+":", photos.toString());
+                Log.i( "onLoaded: ", String.valueOf(photos.length()));
+                URIImage[i]="http://192.168.1.140:8008/media/images/IMG_20161127_062646_fH7pL0p.jpg";
                 for (int j=0; j<photos.length(); j++){
-                    JSONObject image = photos.getJSONObject(j);
-                    int idphoto = image.getInt(KEY_ID);
-                    if (photo_default == 3) {
-                        uri_image = image.getString(KEY_IMAGE);
-                        name_image = image.getString(KEY_NAME_IMAGE);
-                    } else {
-                        uri_image = "http://192.168.1.10:8008/media/images/no_image.jpg";
-                        name_image = "no_image";
-                    }
+                    JSONObject images = photos.getJSONObject(j);
 
-                    map.put(KEY_IMAGE, String.valueOf(getbmpfromURL(uri_image)));
-                    map.put(KEY_NAME_IMAGE, name_image);
+                    String type = images.getString("phototype");
+                    Log.i("photso type ", type);
+
+                        URIImage[i] = images.getString(KEY_IMAGE);
+                        Log.i("photso uri ", URIImage[i]);
+
                 }
+//                Log.i("onLoaded: ", String.valueOf(URIImage[i].length()));
+               /* if (URIImage[i].isEmpty()){
+
+                }*/
+
+                image[i]=ImageManager.downloadImage(URIImage[i]);
+
+                map.put(KEY_ID, IDm[i]);
+                map.put(KEY_NAME, name_merch[i]);
+                map.put(KEY_COUNT, merch_count[i]);
+                map.put(KEY_IMAGE, image[i]);
                 mAndroidMapList.add(map);
             }
 
