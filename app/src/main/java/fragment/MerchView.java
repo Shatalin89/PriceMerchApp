@@ -18,8 +18,11 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 
@@ -30,13 +33,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import request.ImageManager;
+import request.DownloadImageForURI;
 import request.LoadJSONTask;
 import ru.yandex.shatalin.pricemerchapp.R;
 
-public class MerchView extends Fragment implements  AdapterView.OnItemClickListener, LoadJSONTask.Listener  {
+public class MerchView extends Fragment implements  AdapterView.OnItemClickListener, LoadJSONTask.Listener, DownloadImageForURI.setArrayBitmap {
 
-
+    private final static String TAG = "MerchView";
     public static final String MERCH_URL = "/merch/";
     public String URL;
     public ArrayList<HashMap<String, Object>> mAndroidMapList = new ArrayList<HashMap<String, Object>>();
@@ -48,6 +51,7 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
     public ListView MerchListView;
     public ListAdapter adapter;
     Bundle bundle;
+    HashMap<String, Object> map;
     //интерфейс для вывода детальной информации о товаре
     public interface onClickListView {
         void clickListView(String URL_ID);
@@ -71,7 +75,7 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
     public void onLoaded(JSONArray response) {
 
         try {
-            HashMap<String, Object> map;
+
             Log.i("onLoaded letring: ", response.toString());
 
             int[] IDm = new int[20]; // массив айдишников
@@ -91,7 +95,7 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
                 JSONArray photos = merch.getJSONArray("photos");
                 Log.i("photso"+i+":", photos.toString());
                 Log.i( "onLoaded: ", String.valueOf(photos.length()));
-                URIImage[i]="http://192.168.1.140:8008/media/images/IMG_20161127_062646_fH7pL0p.jpg";
+                URIImage[i]="http://192.168.1.10:8008/media/images/no_image.jpg";
                 for (int j=0; j<photos.length(); j++){
                     JSONObject images = photos.getJSONObject(j);
 
@@ -102,13 +106,8 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
                         Log.i("photso uri ", URIImage[i]);
 
                 }
-//                Log.i("onLoaded: ", String.valueOf(URIImage[i].length()));
-               /* if (URIImage[i].isEmpty()){
 
-                }*/
-
-                image[i]=ImageManager.downloadImage(URIImage[i]);
-
+              //  image[i]=
                 map.put(KEY_ID, IDm[i]);
                 map.put(KEY_NAME, name_merch[i]);
                 map.put(KEY_COUNT, merch_count[i]);
@@ -129,7 +128,6 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        //Toast.makeText(getActivity(), mAndroidMapList.get(i).get(KEY_URI),Toast.LENGTH_SHORT).show();
         onClickListView.clickListView(MERCH_URL+mAndroidMapList.get(i).get(KEY_ID)+"/");
     }
 
@@ -139,6 +137,7 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
                 new String[] { KEY_ID, KEY_NAME, KEY_COUNT , KEY_IMAGE},
                 new int[] { R.id.merchid, R.id.merchname, R.id.merchcount, R.id.imageView});
         MerchListView.setAdapter(adapter);
+
     }
 
 
@@ -159,19 +158,16 @@ public class MerchView extends Fragment implements  AdapterView.OnItemClickListe
         }
     }
 
-    public Bitmap getbmpfromURL(String surl){
-        try {
-            URL url = new URL(surl);
-            HttpURLConnection urlcon = (HttpURLConnection) url.openConnection();
-            urlcon.setDoInput(true);
-            urlcon.connect();
-            InputStream in = urlcon.getInputStream();
-            Bitmap mIcon = BitmapFactory.decodeStream(in);
-            return  mIcon;
-        } catch (Exception e) {
-            Log.e("Error", e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
+    @Override
+    public void setBitmap(Bitmap bitmap) {
+
+
     }
+
+    @Override
+    public void setNoImage() {
+
+    }
+
+
 }
